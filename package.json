@@ -1,0 +1,38 @@
+{
+  "name": "generate-ue5-docs",
+  "version": "1.0.0",
+  "description": "UE5 API文档生成工具 - Node.js/TypeScript实现",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "generate-ue5-docs": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "tsx src/index.ts",
+    "dev": "tsx watch src/index.ts"
+  },
+  "keywords": [
+    "ue5",
+    "unreal-engine",
+    "api-documentation",
+    "docs-generator"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "commander": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}

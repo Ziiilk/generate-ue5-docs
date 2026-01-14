@@ -81,6 +81,7 @@ export interface ModuleData {
 
 export interface Config {
   sourceDir: string;
+  pluginsDir?: string;
   outputDir: string;
   engineVersion: string;
   moduleCategories: string[];

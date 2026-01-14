@@ -12,6 +12,9 @@ export const DEFAULT_CONFIG: Config = {
   // 源码目录（相对于项目根目录）
   sourceDir: 'Engine/Source',
   
+  // 插件目录（相对于项目根目录，默认同时扫描）
+  pluginsDir: 'Engine/Plugins',
+  
   // 输出目录
   outputDir: 'docs/ue5-api',
   

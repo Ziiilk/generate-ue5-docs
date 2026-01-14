@@ -2,11 +2,10 @@
 
 ## Purpose
 提供自动化工具，分析UE5.1引擎源码，生成高详细度的API文档集合，供AI agent在开发插件和项目时查询和参考。工具使用 Node.js/TypeScript 实现，位于项目根目录的 `src/` 目录。
-
 ## Requirements
 ### Requirement: UE5引擎源码文档生成系统
 
-系统SHALL提供自动化工具（Node.js/TypeScript实现），分析UE5.1引擎源码（Engine/Source目录下的Runtime、Editor、Developer、Programs模块），生成高详细度的API文档集合，供AI agent在开发插件和项目时查询和参考。
+系统SHALL提供自动化工具（Node.js/TypeScript实现），分析UE5.1引擎源码（Engine/Source目录下的Runtime、Editor、Developer、Programs模块以及Engine/Plugins目录下的插件模块），生成高详细度的API文档集合，供AI agent在开发插件和项目时查询和参考。
 
 #### Scenario: 生成Core模块文档
 - **WHEN** 运行文档生成工具，指定Engine/Source目录
@@ -15,15 +14,25 @@
 - **AND** 生成Core模块的Markdown文档（overview.md, api.md, classes.md等）
 - **AND** 生成Core模块的JSON结构化数据文件
 
+#### Scenario: 生成插件模块文档
+- **WHEN** 运行文档生成工具，指定Engine/Plugins目录
+- **THEN** 工具扫描Engine/Plugins下每个插件目录的Source子目录
+- **AND** 识别插件中的模块（查找.Build.cs文件）
+- **AND** 提取插件模块的API信息（类、结构体、枚举、函数等）
+- **AND** 生成插件模块的Markdown文档（overview.md, api.md, classes.md等）
+- **AND** 生成插件模块的JSON结构化数据文件
+- **AND** 插件模块的category字段设置为"Plugins"
+
 #### Scenario: 生成完整模块索引
 - **WHEN** 文档生成工具完成所有模块的分析
 - **THEN** 生成modules.json文件，包含所有模块的元数据（名称、路径、依赖关系）
 - **AND** 生成api-index.json文件，包含所有API的快速查找信息
 - **AND** 生成index.md总索引文件，提供导航和概览
+- **AND** 索引文件包含Source模块和Plugins模块
 
 #### Scenario: 路径无关性
 - **WHEN** 文档中引用源码文件或模块
-- **THEN** 使用相对路径格式`Engine/Source/{Category}/{ModuleName}`
+- **THEN** 使用相对路径格式`Engine/Source/{Category}/{ModuleName}`或`Engine/Plugins/{PluginName}/Source/{ModuleName}`
 - **AND** 不包含任何绝对路径信息
 - **AND** 文档可以在不同环境中使用，无需修改路径引用
 
@@ -75,6 +84,8 @@
 - **WHEN** 扫描Engine/Source目录
 - **THEN** 工具跳过ThirdParty目录下的所有模块
 - **AND** 仅处理Runtime、Editor、Developer、Programs目录下的模块
+- **WHEN** 扫描Engine/Plugins目录
+- **THEN** 工具跳过ThirdParty插件目录
 
 #### Scenario: 文档格式验证
 - **WHEN** 生成文档后

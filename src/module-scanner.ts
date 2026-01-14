@@ -18,6 +18,72 @@ export class ModuleScanner {
     this.excludeDirs = excludeDirs;
   }
 
+  /**
+   * 扫描Plugins目录下的模块
+   */
+  async scanPlugins(pluginsDir: string): Promise<ModuleInfo[]> {
+    const pluginsPath = resolve(pluginsDir);
+    const pluginModules: ModuleInfo[] = [];
+
+    if (!existsSync(pluginsPath)) {
+      return pluginModules;
+    }
+
+    try {
+      const pluginEntries = await readdir(pluginsPath, { withFileTypes: true });
+
+      for (const pluginEntry of pluginEntries) {
+        if (!pluginEntry.isDirectory()) {
+          continue;
+        }
+
+        // 跳过排除的目录
+        if (this.excludeDirs.includes(pluginEntry.name)) {
+          continue;
+        }
+
+        const pluginDir = join(pluginsPath, pluginEntry.name);
+        const sourceDir = join(pluginDir, 'Source');
+
+        // 检查是否存在Source子目录
+        if (!existsSync(sourceDir)) {
+          continue;
+        }
+
+        try {
+          const moduleEntries = await readdir(sourceDir, { withFileTypes: true });
+
+          for (const moduleEntry of moduleEntries) {
+            if (!moduleEntry.isDirectory()) {
+              continue;
+            }
+
+            const moduleDir = join(sourceDir, moduleEntry.name);
+            const buildCsPath = join(moduleDir, `${moduleEntry.name}.Build.cs`);
+
+            if (existsSync(buildCsPath)) {
+              const moduleInfo = await this.parseModule(
+                moduleDir,
+                'Plugins',
+                buildCsPath,
+                moduleEntry.name
+              );
+              if (moduleInfo) {
+                pluginModules.push(moduleInfo);
+              }
+            }
+          }
+        } catch (error) {
+          console.warn(`Error scanning plugin ${pluginEntry.name}: ${error}`);
+        }
+      }
+    } catch (error) {
+      console.warn(`Error scanning plugins directory: ${error}`);
+    }
+
+    return pluginModules;
+  }
+
   async scan(): Promise<ModuleInfo[]> {
     this.modules = [];
 

@@ -125,6 +125,7 @@ async function main() {
     .description('生成UE5引擎API文档')
     .version('1.0.0')
     .option('--source-dir <dir>', '引擎源码目录', DEFAULT_CONFIG.sourceDir)
+    .option('--plugins-dir <dir>', '插件目录', DEFAULT_CONFIG.pluginsDir)
     .option('--output-dir <dir>', '输出目录', DEFAULT_CONFIG.outputDir)
     .option('--engine-version <version>', '引擎版本', DEFAULT_CONFIG.engineVersion)
     .option('--categories <categories...>', '要处理的模块类别', DEFAULT_CONFIG.moduleCategories)
@@ -135,6 +136,7 @@ async function main() {
   const options = program.opts();
   const config = getConfig({
     sourceDir: options.sourceDir,
+    pluginsDir: options.pluginsDir,
     outputDir: options.outputDir,
     engineVersion: options.engineVersion,
     moduleCategories: options.categories,
@@ -164,6 +166,9 @@ async function main() {
   }
 
   console.log(`源码目录: ${sourceDir}`);
+  if (config.pluginsDir) {
+    console.log(`插件目录: ${config.pluginsDir}`);
+  }
   console.log(`输出目录: ${outputDir}`);
   console.log(`引擎版本: ${config.engineVersion}`);
   console.log(`处理类别: ${config.moduleCategories.join(', ')}`);
@@ -172,9 +177,22 @@ async function main() {
   // 扫描模块
   console.log('扫描模块...');
   const scanner = new ModuleScanner(sourceDir, config.moduleCategories, config.excludeDirs);
-  const modules = await scanner.scan();
+  const sourceModules = await scanner.scan();
 
+  // 扫描插件模块
+  let pluginModules: Awaited<ReturnType<ModuleScanner['scan']>> = [];
+  if (config.pluginsDir) {
+    pluginModules = await scanner.scanPlugins(config.pluginsDir);
+  }
+
+  // 合并模块
+  const modules = [...sourceModules, ...pluginModules];
+
+  // 统计信息
   const stats = scanner.getModuleCount();
+  if (pluginModules.length > 0) {
+    stats['Plugins'] = pluginModules.length;
+  }
   console.log(`找到 ${modules.length} 个模块:`);
   for (const [category, count] of Object.entries(stats)) {
     console.log(`  ${category}: ${count} 个模块`);

@@ -1,6 +1,6 @@
 {
   "name": "generate-ue5-docs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "UE5 API文档生成工具 - Node.js/TypeScript实现",
   "type": "module",
   "main": "dist/index.js",
@@ -24,6 +24,10 @@
   ],
   "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ziiilk/generate-ue5-docs.git"
+  },
   "engines": {
     "node": ">=18.0.0"
   },

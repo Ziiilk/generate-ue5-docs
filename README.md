@@ -7,6 +7,7 @@
 ## 功能
 
 - 扫描Engine/Source目录，识别所有模块
+- 扫描Engine/Plugins目录，识别所有插件模块
 - 解析模块依赖关系
 - 提取API信息（类、函数、枚举等）
 - 生成Markdown文档和JSON结构化数据
@@ -14,28 +15,53 @@
 
 ## 安装
 
+### 通过 npm 安装（推荐）
+
 ```bash
+# 全局安装（推荐，可直接使用 CLI）
+npm install -g generate-ue5-docs
+
+# 或使用 npx（无需安装）
+npx generate-ue5-docs --source-dir <path> --plugins-dir <path> --output-dir <path>
+
+# 本地安装到项目
+npm install generate-ue5-docs
+```
+
+### 从源码安装（开发使用）
+
+```bash
+# 克隆仓库后安装依赖
 npm install
 ```
 
 ## 使用方法
 
-### 基本用法
+### 通过 npm 安装的 CLI 使用（推荐）
 
 ```bash
-npm start -- --source-dir Engine/Source --output-dir docs/ue5-api
+# 全局安装后直接使用
+generate-ue5-docs --source-dir Engine/Source --plugins-dir Engine/Plugins --output-dir docs/ue5-api
+
+# 或使用 npx（无需安装）
+npx generate-ue5-docs --source-dir Engine/Source --plugins-dir Engine/Plugins --output-dir docs/ue5-api
 ```
 
-### 使用编译后的版本
+### 从源码开发使用
 
 ```bash
+# 开发模式（使用 tsx 直接运行）
+npm start -- --source-dir Engine/Source --plugins-dir Engine/Plugins --output-dir docs/ue5-api
+
+# 或编译后运行
 npm run build
-node dist/index.js --source-dir Engine/Source --output-dir docs/ue5-api
+node dist/index.js --source-dir Engine/Source --plugins-dir Engine/Plugins --output-dir docs/ue5-api
 ```
 
 ### 命令行参数
 
 - `--source-dir <dir>`: 引擎源码目录（默认: Engine/Source）
+- `--plugins-dir <dir>`: 插件目录（默认: Engine/Plugins）
 - `--output-dir <dir>`: 输出目录（默认: docs/ue5-api）
 - `--engine-version <version>`: 引擎版本（默认: 5.1）
 - `--categories <categories...>`: 要处理的模块类别（默认: Runtime Editor Developer Programs）
@@ -46,13 +72,19 @@ node dist/index.js --source-dir Engine/Source --output-dir docs/ue5-api
 
 ```bash
 # 只处理 Runtime 模块
-npm start -- --categories Runtime
+generate-ue5-docs --categories Runtime
 
 # 指定不同的输出目录
-npm start -- --output-dir ./my-docs
+generate-ue5-docs --output-dir ./my-docs
 
 # 显示详细日志
-npm start -- --verbose
+generate-ue5-docs --verbose
+
+# 完整示例：指定源码和插件目录
+generate-ue5-docs \
+  --source-dir /path/to/Engine/Source \
+  --plugins-dir /path/to/Engine/Plugins \
+  --output-dir ./docs/ue5-api
 ```
 
 ## 输出结构
@@ -132,10 +164,22 @@ npm start
 
 - 工具需要访问 UE5 引擎源码目录
 - 生成过程可能需要较长时间，取决于源码规模
-- 文档使用相对路径格式（Engine/Source/...），不依赖绝对路径
+- 文档使用相对路径格式：
+  - Source 模块：`Engine/Source/{Category}/{ModuleName}`
+  - Plugins 模块：`Engine/Plugins/{PluginName}/Source/{ModuleName}`
+  - 所有路径均为相对路径，不依赖绝对路径，可在不同环境中使用
+- 插件模块在生成的文档中会被归类到 `Plugins` 类别（category: "Plugins"）
 - 某些复杂的 C++ 语法可能无法完全解析
 - 生成的文档默认保存在 `docs/ue5-api/` 目录（可通过 `--output-dir` 参数修改）
 - `dist/` 和 `docs/` 目录已配置在 `.gitignore` 中，不会被提交到版本控制
+
+## 版本说明
+
+### 1.0.1
+- ✨ 新增：支持扫描 `Engine/Plugins` 目录下的插件模块
+- ✨ 新增：插件模块文档生成和索引支持
+- ✨ 新增：CLI 参数 `--plugins-dir` 用于指定插件目录（默认: Engine/Plugins）
+- 📝 改进：索引文件现在包含 Source 模块和 Plugins 模块的分类显示
 
 ## 迁移说明
 

@@ -372,6 +372,14 @@ class ${cls.name}${inheritance} {
       content += `- [${module.name}](modules/${module.name}/overview.md)\n`;
     }
 
+    const pluginsModules = allModules.filter(m => m.category === 'Plugins');
+    if (pluginsModules.length > 0) {
+      content += '\n### Plugins模块\n\n';
+      for (const module of pluginsModules.sort((a, b) => a.name.localeCompare(b.name))) {
+        content += `- [${module.name}](modules/${module.name}/overview.md)\n`;
+      }
+    }
+
     content += `
 ## 使用说明
 

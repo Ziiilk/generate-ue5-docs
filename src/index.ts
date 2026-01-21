@@ -6,6 +6,7 @@ import { Command } from 'commander';
 import { resolve, join } from 'path';
 import { existsSync } from 'fs';
 import { mkdir, writeFile, readFile } from 'fs/promises';
+import { createRequire } from 'module';
 import { ModuleScanner } from './module-scanner.js';
 import { BuildCSParser } from './build-cs-parser.js';
 import { APIParser } from './api-parser.js';
@@ -13,6 +14,10 @@ import { MarkdownGenerator } from './markdown-generator.js';
 import { JSONGenerator } from './json-generator.js';
 import { getConfig, DEFAULT_CONFIG } from './config.js';
 import { ModuleData, APIData } from './types.js';
+
+// 从 package.json 读取版本号
+const require = createRequire(import.meta.url);
+const packageJson = require('../package.json');
 
 interface LogOptions {
   logFile?: string;
@@ -123,7 +128,7 @@ async function main() {
   program
     .name('generate-ue5-docs')
     .description('生成UE5引擎API文档')
-    .version('1.0.0')
+    .version(packageJson.version)
     .option('--source-dir <dir>', '引擎源码目录', DEFAULT_CONFIG.sourceDir)
     .option('--plugins-dir <dir>', '插件目录', DEFAULT_CONFIG.pluginsDir)
     .option('--output-dir <dir>', '输出目录', DEFAULT_CONFIG.outputDir)
